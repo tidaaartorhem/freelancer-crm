@@ -1,12 +1,13 @@
+import { Suspense } from "react";
 import Link from "next/link";
-import { Building2, Mail, Search, Users } from "lucide-react";
+import { Building2, Mail, Users } from "lucide-react";
 import { listClients } from "@/services/clients";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
 import { ClientDialog } from "@/components/clients/client-dialog";
+import { ClientSearch } from "@/components/clients/client-search";
 
 export const dynamic = "force-dynamic";
 
@@ -26,21 +27,9 @@ export default async function ClientsPage({
         action={<ClientDialog />}
       />
 
-      <form
-        action="/clients"
-        method="get"
-        className="relative mb-5 max-w-sm"
-        role="search"
-      >
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-        <Input
-          name="q"
-          defaultValue={q ?? ""}
-          placeholder="Search clients…"
-          className="pl-9"
-          aria-label="Search clients"
-        />
-      </form>
+      <Suspense>
+        <ClientSearch />
+      </Suspense>
 
       {clients.length === 0 ? (
         <EmptyState

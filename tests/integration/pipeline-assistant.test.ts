@@ -93,7 +93,7 @@ describe("follow-ups service", () => {
 describe("invoices service", () => {
   it("creates an invoice and tracks payment", async () => {
     const inv = await createInvoice(
-      { clientId, number: "INV-TEST-001", amountCents: 250000 },
+      { clientId, number: "INV-TEST-001", amountCents: 250000, status: "draft" },
       dbc
     );
     expect(inv.status).toBe("draft");
