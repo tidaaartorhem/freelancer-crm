@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { activitySchema, type ActivityInput } from "@/lib/validations";
@@ -28,7 +28,7 @@ export function ActivityForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ActivityInput>({
-    resolver: zodResolver(activitySchema),
+    resolver: zodResolver(activitySchema) as unknown as Resolver<ActivityInput>,
     defaultValues: { clientId: clientId ?? "", dealId: dealId ?? "", type: "note" },
   });
 

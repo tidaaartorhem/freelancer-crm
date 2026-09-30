@@ -38,8 +38,10 @@ export function PipelineChart({ data }: { data: StageDatum[] }) {
             }
           />
           <Tooltip
-            formatter={(value: number | undefined, name: string | undefined) => [
-              name === "value" ? formatMoney((value ?? 0) * 100) : value,
+            formatter={(value, name) => [
+              name === "value"
+                ? formatMoney(Number(value ?? 0) * 100)
+                : String(value ?? ""),
               name === "value" ? "Pipeline value" : "Deals",
             ]}
             contentStyle={{

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { clientSchema, type ClientInput } from "@/lib/validations";
 import { createClientAction, updateClientAction } from "@/app/actions";
@@ -23,7 +23,7 @@ export function ClientForm({ initial, onDone }: ClientFormProps) {
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<ClientInput>({
-    resolver: zodResolver(clientSchema),
+    resolver: zodResolver(clientSchema) as unknown as Resolver<ClientInput>,
     defaultValues: {
       name: initial?.name ?? "",
       email: initial?.email ?? "",

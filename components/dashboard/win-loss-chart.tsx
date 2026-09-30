@@ -40,7 +40,7 @@ export function WinLossChart({
               <Cell fill="#e4e4e7" />
             </Pie>
             <Tooltip
-              formatter={(v: number | undefined) => formatMoney((v ?? 0) * 100)}
+              formatter={(v) => formatMoney(Number(v ?? 0) * 100)}
               contentStyle={{ borderRadius: 8, border: "1px solid #e4e4e7", fontSize: 13 }}
             />
           </PieChart>

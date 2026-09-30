@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { dealSchema, type DealInput } from "@/lib/validations";
 import { createDealAction } from "@/app/actions";
@@ -24,7 +24,7 @@ export function DealForm({ clients, defaultStage, onDone }: DealFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<DealInput>({
-    resolver: zodResolver(dealSchema),
+    resolver: zodResolver(dealSchema) as unknown as Resolver<DealInput>,
     defaultValues: {
       stage: (defaultStage as DealInput["stage"]) ?? "lead",
       probability: 50,

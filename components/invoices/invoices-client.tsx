@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
@@ -64,7 +64,7 @@ function InvoiceForm({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<InvoiceInput>({
-    resolver: zodResolver(invoiceSchema),
+    resolver: zodResolver(invoiceSchema) as unknown as Resolver<InvoiceInput>,
     defaultValues: { status: "draft" },
   });
 
