@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { clients, deals, invoices, type InvoiceStatus } from "@/db/schema";
 import { db, type DbClient } from "@/lib/db";
+import { isInvoiceOverdue } from "@/lib/format";
 import type { InvoiceInput } from "@/lib/validations";
 
 export async function listInvoices(dbc: DbClient = db) {
@@ -60,7 +61,7 @@ export async function deleteInvoice(id: string, dbc: DbClient = db) {
   await dbc.delete(invoices).where(eq(invoices.id, id));
 }
 
-export async function invoiceTotals(dbc: DbClient = db) {
+export async function invoiceTotals(dbc: DbClient = db, now: Date = new Date()) {
   const all = await dbc.select().from(invoices);
   return {
     outstandingCents: all
@@ -69,6 +70,6 @@ export async function invoiceTotals(dbc: DbClient = db) {
     paidCents: all
       .filter((i) => i.status === "paid")
       .reduce((s, i) => s + i.amountCents, 0),
-    overdueCount: all.filter((i) => i.status === "overdue").length,
+    overdueCount: all.filter((i) => isInvoiceOverdue(i.status, i.dueDate, now)).length,
   };
 }

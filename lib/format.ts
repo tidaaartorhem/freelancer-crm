@@ -35,3 +35,22 @@ export function isOverdue(d: Date | string | null | undefined): boolean {
   today.setHours(0, 0, 0, 0);
   return date < today;
 }
+
+/**
+ * The one definition of invoice "overdue" used across the app: a sent
+ * invoice whose due date is past. Drafts are not outstanding and paid
+ * invoices are settled, so neither can be overdue — this is what keeps
+ * the dashboard stat and the invoices page badge in agreement. The
+ * legacy "overdue" status is treated like sent for backward compatibility.
+ */
+export function isInvoiceOverdue(
+  status: string,
+  d: Date | string | null | undefined,
+  now: Date = new Date()
+): boolean {
+  if (status !== "sent" && status !== "overdue") return false;
+  if (!d) return false;
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  return new Date(d) < today;
+}

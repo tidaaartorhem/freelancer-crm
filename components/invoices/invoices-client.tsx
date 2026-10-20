@@ -11,7 +11,7 @@ import {
   deleteInvoiceAction,
   setInvoiceStatusAction,
 } from "@/app/actions";
-import { formatDate, formatMoney, isOverdue } from "@/lib/format";
+import { formatDate, formatMoney, isInvoiceOverdue } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -210,8 +210,7 @@ export function InvoicesClient({
       ) : (
         <div className="space-y-3">
           {invoices.map((inv) => {
-            const overdue =
-              inv.status !== "paid" && inv.dueDate && isOverdue(inv.dueDate);
+            const overdue = isInvoiceOverdue(inv.status, inv.dueDate);
             return (
               <Card key={inv.id}>
                 <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
