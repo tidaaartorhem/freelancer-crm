@@ -12,6 +12,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ResetDemoButton } from "@/components/demo/reset-demo-button";
 
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -36,6 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </span>
             Freelancer CRM
           </Link>
+          <ResetDemoButton />
         </div>
         <nav aria-label="Primary" className="overflow-x-auto px-2 pb-2">
           <ul className="flex gap-1">
@@ -102,9 +104,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 })}
               </ul>
             </nav>
-            <p className="px-2 text-xs text-zinc-400">
-              Pipeline, clients & follow-ups in one place.
-            </p>
+            <div className="mt-auto rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+              <p className="text-xs font-semibold text-zinc-900">Demo workspace</p>
+              <p className="mt-0.5 text-xs text-zinc-500">
+                Dates go stale over time — refresh them in one click.
+              </p>
+              <div className="mt-2">
+                <ResetDemoButton />
+              </div>
+            </div>
           </div>
         </aside>
 
