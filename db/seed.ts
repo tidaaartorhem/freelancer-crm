@@ -1,5 +1,5 @@
 import { addDays, startOfDay, subDays } from "date-fns";
-import { db } from "../lib/db";
+import { db, type DbClient } from "../lib/db";
 import {
   activities,
   clients,
@@ -17,19 +17,47 @@ function at(base: Date, dayOffset: number, h = 9, m = 0): Date {
   return d;
 }
 
-async function main() {
-  const today = startOfDay(new Date());
+export interface SeedDemoDataOptions {
+  /** Anchor "today" for all relative seed dates. Defaults to now. */
+  now?: Date;
+}
+
+export interface SeedDemoDataSummary {
+  clients: number;
+  deals: number;
+  activities: number;
+  followups: number;
+  invoices: number;
+}
+
+/**
+ * Wipes the demo workspace and rebuilds it anchored to `now`.
+ *
+ * Idempotent — running it twice yields the same rows. Accepts the db
+ * client (like every service) so it can run from the `db:seed` CLI
+ * script, the App Hosting build, a server action, or an isolated test
+ * database.
+ *
+ * Demo-only by design: this app ships as a public demo with a single
+ * shared workspace. If per-user auth is ever introduced, the reset
+ * path must stay scoped to the demo workspace or be removed.
+ */
+export async function seedDemoData(
+  client: DbClient,
+  opts: SeedDemoDataOptions = {}
+): Promise<SeedDemoDataSummary> {
+  const today = startOfDay(opts.now ?? new Date());
   console.log("Seeding Freelancer CRM demo data...");
 
   // Clear existing (FK-safe order)
-  await db.delete(drafts);
-  await db.delete(invoices);
-  await db.delete(followups);
-  await db.delete(activities);
-  await db.delete(deals);
-  await db.delete(clients);
+  await client.delete(drafts);
+  await client.delete(invoices);
+  await client.delete(followups);
+  await client.delete(activities);
+  await client.delete(deals);
+  await client.delete(clients);
 
-  const [maya, jonas, priya, tom, sofia, david, amara, lena] = await db
+  const [maya, jonas, priya, tom, sofia, david, amara, lena] = await client
     .insert(clients)
     .values([
       {
@@ -141,7 +169,7 @@ async function main() {
   const dealIds: Record<string, string> = {};
   for (const s of dealSeeds) {
     const created = at(today, -s.createdDaysAgo);
-    const [row] = await db
+    const [row] = await client
       .insert(deals)
       .values({
         title: s.title,
@@ -193,7 +221,7 @@ async function main() {
   ];
 
   for (const a of activitySeeds) {
-    await db.insert(activities).values({
+    await client.insert(activities).values({
       clientId: a.client.id,
       dealId: a.dealKey ? dealIds[a.dealKey] : null,
       type: a.type,
@@ -219,7 +247,7 @@ async function main() {
 
   for (const f of followupSeeds) {
     const seed = dealSeeds.find((d) => d.key === f.dealKey)!;
-    await db.insert(followups).values({
+    await client.insert(followups).values({
       dealId: dealIds[f.dealKey],
       clientId: seed.client.id,
       title: f.title,
@@ -229,7 +257,7 @@ async function main() {
   }
 
   // ---- Invoices ----
-  await db.insert(invoices).values([
+  await client.insert(invoices).values([
     {
       number: "INV-2026-001",
       dealId: dealIds["d11"],
@@ -262,9 +290,25 @@ async function main() {
   ]);
 
   console.log("Seed complete: 8 clients, 15 deals, activities, 5 follow-ups, 3 invoices.");
+  return {
+    clients: 8,
+    deals: dealSeeds.length,
+    activities: activitySeeds.length,
+    followups: followupSeeds.length,
+    invoices: 3,
+  };
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+async function main() {
+  await seedDemoData(db);
+}
+
+// Only seed when run directly (`npm run db:seed`) — importing this module
+// (e.g. from a server action) must never wipe the database as a side effect.
+const entryScript = process.argv[1] ?? "";
+if (entryScript.endsWith("db/seed.ts") || entryScript.endsWith("db\\seed.ts")) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
