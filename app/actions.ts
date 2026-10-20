@@ -38,6 +38,7 @@ import {
   markDraftSent,
   rejectDraft,
 } from "@/services/drafts";
+import { resetDemoData } from "@/services/demo";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -264,6 +265,22 @@ export async function deleteDraftAction(id: string): Promise<ActionResult> {
   try {
     await deleteDraft(id);
     revalidate(["/assistant"]);
+    return { ok: true };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// ---------- Demo workspace ----------
+
+/**
+ * Resets the demo workspace and re-anchors all seed dates to today.
+ * Demo-only: the app ships as a public demo with one shared workspace.
+ */
+export async function resetDemoDataAction(): Promise<ActionResult> {
+  try {
+    await resetDemoData();
+    revalidate(["/", "/deals", "/clients", "/assistant", "/followups", "/invoices"]);
     return { ok: true };
   } catch (e) {
     return fail(e);
