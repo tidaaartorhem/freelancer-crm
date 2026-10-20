@@ -28,7 +28,8 @@ Seeded data: 8 clients, 15 deals across all stages (3 flagged at-risk), 16 activ
 - **AI pipeline assistant** — deterministic at-risk detection (stale activity, passed close dates, stalled proposals) plus AI-drafted follow-up emails. Human **approval queue**: drafts are pending until you approve them; only approved drafts can be marked sent.
 - **Clients** — full CRUD, contact info, tags, per-client activity timeline, linked deals.
 - **Follow-ups & reminders** — due dates with overdue highlighting, completion tracking.
-- **Invoices (light)** — create from a won deal or manually, mark sent/paid, overdue detection.
+- **Invoices (light)** — create from a won deal or manually, mark sent/paid, overdue detection (one shared date-based rule: a sent invoice past its due date — the dashboard stat and the invoices page badge always agree).
+- **Reset demo data** — one click in the sidebar (or the mobile header) wipes the demo workspace and re-seeds it with dates anchored to today, so the demo never goes stale. Confirms first; anything you changed in the demo is lost.
 
 ## Architecture
 
@@ -74,7 +75,7 @@ Useful scripts: `npm run db:generate` (new migration), `npm run db:migrate`, `np
 ## Tests
 
 ```bash
-npm test            # vitest: unit + integration (39 tests)
+npm test            # vitest: unit + integration (53 tests)
 npm run test:e2e    # Playwright: primary journey
                     #   client → deal → drag through pipeline →
                     #   AI flags at-risk → draft → approve → sent
